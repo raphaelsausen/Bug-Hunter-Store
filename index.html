@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="icon" href="bh.jpg">
+    <title>Bug Hunters Store</title>
+</head>
+
+<body>
+    <header>
+        <div class="logo-container">
+            <img src="\imagens\LOGO.jpeg" alt="Logo Bug Hunters Store" class="logo" />
+            <h1>Bug Hunters Store</h1>
+        </div>
+
+        <div>
+            <button id="toggleTheme">🌞 Modo Claro</button>
+            <button id="download" onclick="dowloadPDF()"> 💾 Baixar Catálogo</button>
+        </div>
+    </header>
+
+    <main>
+        <div class="filtros">
+            <input type="text" id="busca" placeholder="🔍 Buscar produto..." />
+            <select id="filtroCategoria">
+                <option value="todas">Todas as Categorias</option>
+                <option value="Notebooks">Notebooks</option>
+                <option value="Periféricos">Periféricos</option>
+                <option value="Monitores">Monitores</option>
+                <option value="Áudio">Áudio</option>
+                <option value="Móveis">Móveis</option>
+                <option value="Armazenamento">Armazenamento</option>
+            </select>
+            <input type="number" id="precoMin" placeholder="Preço mínimo" min="0" />
+            <input type="number" id="precoMax" placeholder="Preço máximo" min="0" />
+        </div>
+
+        <div>
+            <p id="mensagemVazia" style="text-align: center; display: none; padding: 20px; color: #999;">
+                ❌ Nenhum produto encontrado. Tente outro nome ou categoria.
+            </p>
+        </div>
+
+        <div id="catalogo" class="catalogo-container"></div>
+
+    </main>
+
+    <a class="whatsapp" href="https://wa.me/5551997591586" title="Fale conosco no WhatsApp" target="_blank"><i
+            class="fab fa-whatsapp"></i></a>
+
+    <footer>
+        <p>🐞 Bug Hunters Store &copy; 2025 — Caçando bugs desde que os cabos eram paralelos.</p>
+        <p>💻 Se encontrar um bug... por favor, não o alimente 🍕</p>
+        <p>📦 Endereço: Rua JS, nº 404 — Canoas/RS</p>
+    </footer>
+
+    <!-- janela de Produto -->
+    <div id="produtoModal" class="modal">
+        <div class="modal-content">
+            <span class="fechar-modal">&times;</span>
+            <img id="modalImagem" src="" alt="" />
+            <h2 id="modalTitulo"></h2>
+            <p id="modalDescricao"></p>
+            <p class="preco" id="modalPreco"></p>
+        </div>
+    </div>
+
+    <script>
+        const bugHuntersCatalog = [
+            {
+                nome: 'Notebook Gamer BugMax X15',
+                descricao: "Intel Core i7, 16GB RAM, SSD 1TB, RTX 4060.",
+                preco: 7499.99,
+                categoria: "Notebooks",
+                imagem: "/imagens/notebook-gamer.jpeg"
+            },
+            {
+                nome: 'Mouse Óptico UltraClick',
+                descricao: 'RGB, 16000 DPI, sensor óptico de precisão.',
+                preco: 199.90,
+                categoria: 'Periféricos',
+                imagem: "/imagens/mouse-optico.jpeg"
+            },
+            {
+                nome: 'Teclado Mecânico TactilePro',
+                descricao: 'Switches Blue, anti-ghosting, iluminação LED.',
+                preco: 349.90,
+                categoria: 'Periféricos',
+                imagem: "/imagens/teclado.jpeg"
+            },
+            {
+                nome: 'Monitor Curvo UltraWide 34”',
+                descricao: '144Hz, QHD, FreeSync Premium.',
+                preco: 2899.99,
+                categoria: 'Monitores',
+                imagem: '/imagens/monitor-curvo.jpeg'
+            },
+            {
+                nome: 'Headset 7.1 Surround Sound',
+                descricao: 'Almofadas macias, microfone removível.',
+                preco: 479.00,
+                categoria: 'Áudio',
+                imagem: '/imagens/fone-gamer.jpeg'
+            },
+            {
+                nome: 'Cadeira Gamer Ergonomic Pro',
+                descricao: 'Ajuste lombar, reclinável até 180°, couro PU.',
+                preco: 1599.99,
+                categoria: 'Móveis',
+                imagem: "/imagens/cadeira-gamer.jpeg"
+            },
+            {
+                nome: 'SSD Externo 2TB USB 3.1',
+                descricao: 'Portátil, resistente a impacto, alta velocidade.',
+                preco: 429.99,
+                categoria: 'Armazenamento',
+                imagem: '/imagens/ssd.jpeg'
+            },
+
+            {
+                nome: "Headset 7.1 Roxo Sem Fio",
+                descricao: "Bluetooth 2.4G, microfone com supressão de ruído.",
+                preco: 599.99,
+                categoria: "Áudio",
+                imagem: '/imagens/fone-roxo.jpeg'
+            },
+            {
+                nome: "Controle GameSir Tarantula Pro Sem Fio",
+                descricao: "Compativel com PC Xbox Nintendo Switch e celular, Bluetooth 2.4G, botões customizáveis.",
+                preco: 399.99,
+                categoria: "Periféricos",
+                imagem: '/imagens/controle-pro.jpeg'
+            },
+            {
+                nome: "Notebook Gamer Acer Nitro V15",
+                descricao: "Processador Intel® Core i5-13420H de 13ª geração, Placa de Vídeo Nvidia® GeForce® RTX 4050, 144hz Full HD, 16GB RAM DDR5",
+                preco: 6999.99,
+                categoria: "Notebooks",
+                imagem: '/imagens/notebook-gamer (3).jpeg'
+            },
+            {
+                nome: "Notebook Gamer ROG Flow Z13",
+                descricao: "Processador Intel® Core™ i9-13900H, Placa de Video NVIDIA® GeForce RTX™ 2050, 165hz Full HD, 16GB RAM LPDDR5",
+                preco: 6499.99,
+                categoria: "Notebooks",
+                imagem: '/imagens/notebook-gamer (2).jpeg'
+            },
+            {
+
+                nome: "Monitor Odyssey G5 27",
+                descricao: "Resolução QHD, Curvatura com 1000R, 165hz, 1ms de tempo de resposta e contém ADM Radeon FreeSync.",
+                preco: 1499.99,
+                categoria: "Monitores",
+                imagem: '/imagens/monitor-odyssey.jpeg'
+            },
+            {
+                nome: "SSD Externo 1TB USB 3.1",
+                descricao: "Compacto e alta velocidade.",
+                preco: 229.99,
+                categoria: "Armazenamento",
+                imagem: '/imagens/ssd-externo.jpeg'
+            },
+            {
+                nome: "Gabinete Gamer RGB",
+                descricao: "Gabinete RBG gamer, lateral de vidro",
+                preco: 449.90,
+                categoria: "Móveis",
+                imagem: '/imagens/gabinete-gamer.jpeg'
+            },
+            {
+                nome: "Mesa Gamer com pratileiras",
+                descricao: "Mesa Gamer 186,6cm, 02 prateleiras ME4167 Tecnomóbili",
+                preco: 459.90,
+                categoria: "Móveis",
+                imagem: '/imagens/mesa-gamer.jpeg'
+            },
+            {
+                nome: "Caixa de som JBL Bluethoot",
+                descricao: "Caixa De Som Jbl Partybox, 710 Bluetooth, 800W",
+                preco: 4599.90,
+                categoria: "Áudio",
+                imagem: '/imagens/caixa-jbl.jpeg'
+            },
+        ];
+
+        const catalogo = document.getElementById("catalogo");
+        const buscaInput = document.getElementById("busca");
+        const filtroCategoria = document.getElementById("filtroCategoria");
+        const precoMinInput = document.getElementById("precoMin");
+        const precoMaxInput = document.getElementById("precoMax");
+        const mensagemVazia = document.getElementById("mensagemVazia");
+
+        // função exibir produtos
+        function exibirProdutos(produtos) {
+            catalogo.innerHTML = "";
+
+            if (produtos.length === 0) {
+                mensagemVazia.style.display = "block";
+                return;
+            } else {
+                mensagemVazia.style.display = "none";
+            }
+
+            produtos.forEach(produto => {
+                const produtoDiv = document.createElement("div");
+                produtoDiv.className = "produto";
+                produtoDiv.innerHTML = `
+      <img src="${produto.imagem}" alt="${produto.nome}" />
+      <h2>${produto.nome}</h2>
+      <p>${produto.descricao}</p>
+      <p class="preco">R$ ${produto.preco.toFixed(2)}</p>
+      <button class="btn-comprar">🛒 Comprar</button>
+      <button class="btn-carrinho">➕ Adicionar ao Carrinho</button>
+    `;
+
+                produtoDiv.querySelector(".btn-comprar").addEventListener("click", (e) => {
+                    e.stopPropagation();
+                    alert(`Você comprou: ${produto.nome}!`);
+                });
+
+                produtoDiv.querySelector(".btn-carrinho").addEventListener("click", (e) => {
+                    e.stopPropagation();
+                    alert(`${produto.nome} Adicionado ao carrinho! ✅`);
+                });
+
+                produtoDiv.addEventListener("click", () => abrirModal(produto));
+                catalogo.appendChild(produtoDiv);
+
+            });
+        }
+
+        // Função filtrar produtos
+        function filtrarProdutos() {
+            const nomeprod = buscaInput.value.toLowerCase();
+            const categoria = filtroCategoria.value;
+            const precoMin = parseFloat(precoMinInput.value) || 0;
+            const precoMax = parseFloat(precoMaxInput.value) || Infinity;
+
+            const filtrados = bugHuntersCatalog.filter(p =>
+                p.nome.toLowerCase().includes(nomeprod) &&
+                (categoria === "todas" || p.categoria === categoria) &&
+                p.preco >= precoMin &&
+                p.preco <= precoMax
+            );
+
+            exibirProdutos(filtrados);
+        }
+
+        buscaInput.addEventListener("input", filtrarProdutos);
+        filtroCategoria.addEventListener("change", filtrarProdutos);
+        precoMinInput.addEventListener("input", filtrarProdutos);
+        precoMaxInput.addEventListener("input", filtrarProdutos);
+
+        // Modo Claro/Escuro
+        const toggleBtn = document.getElementById("toggleTheme");
+        toggleBtn.addEventListener("click", () => {
+            document.body.classList.toggle("light-mode");
+            toggleBtn.textContent = document.body.classList.contains("light-mode")
+                ? "🌙 Modo Escuro"
+                : "🌞 Modo Claro";
+        });
+
+        // janela dos produtos
+        const modal = document.getElementById("produtoModal");
+        const modalImagem = document.getElementById("modalImagem");
+        const modalTitulo = document.getElementById("modalTitulo");
+        const modalDescricao = document.getElementById("modalDescricao");
+        const modalPreco = document.getElementById("modalPreco");
+
+        // função abrir janela de produtos
+        function abrirModal(produto) {
+            modalImagem.src = produto.imagem;
+            modalTitulo.textContent = produto.nome;
+            modalDescricao.textContent = produto.descricao;
+            modalPreco.textContent = "R$ " + produto.preco.toFixed(2);
+            modal.style.display = "block";
+        }
+
+        // fechar a janela de produtos
+        document.querySelector(".fechar-modal").onclick = () => {
+            modal.style.display = "none";
+        };
+
+        window.onclick = event => {
+            if (event.target === modal) {
+                modal.style.display = "none";
+            }
+        };
+
+        // função baixar PDF
+        function dowloadPDF() {
+            const element = document.getElementById('catalogo');
+            const options = {
+                margin: 0.6,
+                filename: "bughunters_catalogo.pdf",
+                image: { type: "jpeg", quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+            };
+
+            html2pdf().set(options).from(element).save();
+        }
+
+        exibirProdutos(bugHuntersCatalog);
+    </script>
+</body>
+
+</html>
